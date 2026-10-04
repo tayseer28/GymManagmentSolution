@@ -1,12 +1,12 @@
-﻿using GymManagment.DAL.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using GymManagment.DAL.Data.Models;
 
 
-namespace GymManagment.DAL.Configurations
+namespace GymManagment.DAL.Data.Configurations
 {
     internal class MemberConfiguration : GymUserConfiguration<Member> , IEntityTypeConfiguration<Member>
     {

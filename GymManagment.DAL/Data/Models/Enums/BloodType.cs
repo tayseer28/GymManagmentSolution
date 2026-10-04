@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagment.DAL.Models.Enums
+namespace GymManagment.DAL.Data.Models.Enums
 {
     public enum BloodType
     {

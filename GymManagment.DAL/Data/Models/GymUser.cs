@@ -1,9 +1,9 @@
-﻿using GymManagment.DAL.Models.Enums;
+﻿using GymManagment.DAL.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagment.DAL.Models
+namespace GymManagment.DAL.Data.Models
 {
     public abstract class GymUser : BaseEntity
     {

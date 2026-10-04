@@ -1,5 +1,4 @@
 ﻿using GymManagment.DAL.Repositories.Interfaces;
-using GymManagment.DbContexts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

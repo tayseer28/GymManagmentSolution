@@ -1,11 +1,11 @@
-﻿using GymManagment.DAL.Models;
+﻿using GymManagment.DAL.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GymManagment.DAL.Configurations
+namespace GymManagment.DAL.Data.Configurations
 {
     internal class SessionConfiguration : IEntityTypeConfiguration<Session>
     {
