@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GymManagment.DAL.Data.Models
 {
-    public class BaseEntity
+    public abstract class BaseEntity
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
