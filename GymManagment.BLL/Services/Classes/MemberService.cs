@@ -15,6 +15,42 @@ namespace GymManagment.BLL.Services.Classes
         {
             _memberRepository = memberRepository;
         }
+
+        public async Task<bool> CreateMemberAsync(CreateMemberViewModel model, CancellationToken ct = default)
+        {
+            // if email or phone exist return false 
+            var emailExist = await _memberRepository.AnyAsync(M => M.Email == model.Email, ct);
+            var phoneExist = await _memberRepository.AnyAsync(M => M.Phone == model.Phone, ct);
+            if(emailExist || phoneExist) return false;
+
+            // else trnasform the model to member and save it to the database
+            var member = new Member
+            {
+                Name = model.Name,
+                Email = model.Email,
+                Phone = model.Phone,
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                Address = new Address
+                {
+                    City = model.City,
+                    Street = model.Street,
+                    BuildingNo = model.BuildingNumber
+                },
+                HealthRecord = new HealthRecord
+                {
+                    BloodType = model.HealthRecordViewModel.BloodType,
+                    Weight = model.HealthRecordViewModel.Weight,
+                    Height = model.HealthRecordViewModel.Height,
+                    Note = model.HealthRecordViewModel.Note
+
+                }
+
+            };
+            var result = await _memberRepository.CreateAsync(member, ct);
+            return result > 0;
+        }
+
         public async Task<IEnumerable<MemberViewModel>> GetAllMembersAsync(CancellationToken ct = default)
         {
             var members = await _memberRepository.GetAllAsync(ct : ct);

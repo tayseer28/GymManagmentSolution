@@ -1,6 +1,7 @@
 ﻿using GymManagment.DAL.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace GymManagment.DAL.Repositories.Interfaces
@@ -12,5 +13,6 @@ namespace GymManagment.DAL.Repositories.Interfaces
         Task<int> CreateAsync(TEntity entity, CancellationToken ct = default);
         Task<int> UpdateAsync(TEntity entity, CancellationToken ct = default);
         Task<int> DeleteAsync(TEntity entity, CancellationToken ct = default);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
     }
 }

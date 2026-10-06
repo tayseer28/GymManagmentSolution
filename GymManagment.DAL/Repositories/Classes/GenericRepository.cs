@@ -4,6 +4,7 @@ using GymManagment.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace GymManagment.DAL.Repositories.Classes
@@ -18,6 +19,12 @@ namespace GymManagment.DAL.Repositories.Classes
             _dbContext = dbContext;
             _dbSet = dbContext.Set<TEntity>();
         }
+
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default)
+        {
+            return await _dbSet.AnyAsync(predicate, ct);
+        }
+
         public async Task<int> CreateAsync(TEntity entity, CancellationToken ct = default)
         {
             _dbSet.Add(entity);
