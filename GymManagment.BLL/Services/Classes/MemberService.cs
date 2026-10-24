@@ -132,8 +132,8 @@ namespace GymManagment.BLL.Services.Classes
             var model = await _memberRepository.GetByIdAsync(memberId, ct);
             if (model is null) return false;
             // if email or phone exist return false 
-            var emailExist = await _memberRepository.AnyAsync(M => M.Email == model.Email && M.Id != memberId, ct);
-            var phoneExist = await _memberRepository.AnyAsync(M => M.Phone == model.Phone && M.Id != memberId, ct);
+            var emailExist = await _memberRepository.AnyAsync(M => M.Email == member.Email && M.Id != memberId);
+            var phoneExist = await _memberRepository.AnyAsync(M => M.Phone == member.Phone && M.Id != memberId);
             if (emailExist || phoneExist) return false;
 
             model.Email = member.Email;
