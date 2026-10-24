@@ -23,9 +23,31 @@ namespace GymManagment.PL.Controllers
 
         // GET BaseUrl/Member/MemberDetails/{id}
         // MemberDetails - Show details of a specific member by ID
+        public async Task<IActionResult> MemberDetails(int id, CancellationToken ct)
+        {
+            // Implementation to show member details by ID
+            var memberDetails=  await _memberService.GetMemberDetailsByIdAsync(id, ct);
+            if(memberDetails is null)
+            {
+                TempData["ErrorMessage"] = "Member Fetch Failed";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(memberDetails);
+        }
 
         // GET BaseUrl/Member/HealthRecordDetails/{id}
         // HealthRecordDetails - Show health records of a specific member by ID
+        public async Task<IActionResult> HealthRecordDetails(int id, CancellationToken ct)
+        {
+            var result = await _memberService.GetMemberHealthRecordDetailsAsync(id, ct);
+            if(result is null)
+            {
+                TempData["ErrorMessage"] = "Member Health Record Fetch Failed";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(result);
+           
+        } 
 
         #region Create Member
 
@@ -54,9 +76,32 @@ namespace GymManagment.PL.Controllers
 
         // GET BaseUrl/Member/Edit/{id}
         // MemberEdit - Show form with pre-filled data to edit
+        [HttpGet]
+        public async Task<IActionResult> EditMember(int id , CancellationToken ct)
+        {
+            var result = await _memberService.GetMemberToUpdateAsync(id, ct);
+            if(result == null)
+            {
+                TempData["ErrorMessage"] = "Member Not Found";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(result);
+        }
 
         // PUT BaseUrl/Member/Edit  {member}
         // MemberEdit - Submit form
+        [HttpPost]
+        public async Task<IActionResult> EditMember(int id , MemberToUpdateViewModel member, CancellationToken ct)
+        {
+            if (!ModelState.IsValid) return View(member);
+            var result = await _memberService.UpdateMemberDetailsAsync(id, member, ct);
+            if (result)
+                TempData["SucessMessage"] = "Member Updated Successfully";
+            else
+                TempData["ErrorMessage"] = "Failed to Update Member";
+
+            return RedirectToAction(nameof(Index));
+        }
 
         #endregion
 
