@@ -91,7 +91,7 @@ namespace GymManagment.PL.Controllers
         // PUT BaseUrl/Member/Edit  {member}
         // MemberEdit - Submit form
         [HttpPost]
-        public async Task<IActionResult> EditMember(int id , MemberToUpdateViewModel member, CancellationToken ct)
+        public async Task<IActionResult> EditMember([FromRoute] int id , MemberToUpdateViewModel member, CancellationToken ct)
         {
             if (!ModelState.IsValid) return View(member);
             var result = await _memberService.UpdateMemberDetailsAsync(id, member, ct);
@@ -109,9 +109,31 @@ namespace GymManagment.PL.Controllers
 
         // GET BaseUrl/Member/Delete/{id}
         // Delete - Show confirmation page for deletion
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id , CancellationToken ct)
+        {
+            var result = await _memberService.GetMemberDetailsByIdAsync(id, ct);
+            if(result == null)
+            {
+                TempData["ErrorMessage"] = "User Not Found";
+                return RedirectToAction(nameof(Index));
+            }
+            return View();
+        }
 
         // POST BaseUrl/Member/Delete/{id}
         // DeleteConfirmed - Delete after confirmation
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed([FromRoute]int id , CancellationToken ct)
+        {
+            var result = await _memberService.RemoveMember(id, ct);
+            if (!result)
+                TempData["ErrorMessage"] = "Cannot Delete Member";
+            else
+                TempData["SuccessMessage"] = "Member Deleted Succesfully!";
+
+            return RedirectToAction(nameof(Index));
+        }
         #endregion
     }
 }

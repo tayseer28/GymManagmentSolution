@@ -14,16 +14,19 @@ namespace GymManagment.BLL.Services.Classes
         private readonly IGenericRepository<Membership> _membershipRepository;
         private readonly IGenericRepository<Plan> _planRepository;
         private readonly IGenericRepository<HealthRecord> _healthRepository;
+        private readonly IGenericRepository<Booking> _bookingRepository;
 
         public MemberService(IGenericRepository<Member> memberRepository,
             IGenericRepository<Membership> membershipRepository,
             IGenericRepository<Plan> planRepository,
-            IGenericRepository<HealthRecord> healthRepository)
+            IGenericRepository<HealthRecord> healthRepository,
+            IGenericRepository<Booking> bookingRepository)
         {
             _memberRepository = memberRepository;
             _membershipRepository = membershipRepository;
             _planRepository = planRepository;
             _healthRepository = healthRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<bool> CreateMemberAsync(CreateMemberViewModel model, CancellationToken ct = default)
@@ -127,6 +130,7 @@ namespace GymManagment.BLL.Services.Classes
            
         }
 
+
         public async Task<bool> UpdateMemberDetailsAsync(int memberId, MemberToUpdateViewModel member, CancellationToken ct = default)
         {
             var model = await _memberRepository.GetByIdAsync(memberId, ct);
@@ -167,6 +171,16 @@ namespace GymManagment.BLL.Services.Classes
                 };
             }
                   
+        }
+        public async Task<bool> RemoveMember(int memberId, CancellationToken ct = default)
+        {
+            var member = await _memberRepository.GetByIdAsync(memberId, ct);
+            if (member is null) return false;
+            var hasFutureBookings = await _bookingRepository.AnyAsync(B => B.MemberId == memberId && B.Session.StartDate > DateTime.Now, ct);
+            if (hasFutureBookings) return false; //if member has future bookings then we cannot delete him
+
+            var result = await _memberRepository.DeleteAsync(member, ct);
+            return result > 0;
         }
     }
 }
