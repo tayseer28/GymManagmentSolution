@@ -15,11 +15,12 @@ namespace GymManagment
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            //builder.Services.AddScoped<IPlanRepository, PlanRepository>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IPlanService, PlanService>();
             builder.Services.AddScoped<IPlanService, PlanService>();
+            builder.Services.AddScoped<ITrainerService, TrainerService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddDbContext<GymManagmentDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

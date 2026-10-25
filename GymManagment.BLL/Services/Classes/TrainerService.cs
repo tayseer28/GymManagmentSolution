@@ -10,18 +10,15 @@ namespace GymManagment.BLL.Services.Classes
 {
     public class TrainerService : ITrainerService
     {
-        private readonly IGenericRepository<Trainer> _trainerRepository;
-        private readonly IGenericRepository<Session> _sessionRepository;
-        public TrainerService(IGenericRepository<Trainer> trainerRepository,
-            IGenericRepository<Session> sessionRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public TrainerService(IUnitOfWork unitOfWork)
         {
-            _trainerRepository = trainerRepository;
-            _sessionRepository = sessionRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<TrainerViewModel>> GetAllTrainersAsync(CancellationToken ct = default)
         {
-            var trainers = await _trainerRepository.GetAllAsync(ct: ct);
+            var trainers = await _unitOfWork.GetRepository<Trainer>().GetAllAsync(ct: ct);
             if (trainers is null) return [];
             return trainers.Select(T => new TrainerViewModel()
             {
@@ -35,8 +32,8 @@ namespace GymManagment.BLL.Services.Classes
 
         public async Task<bool> CreateTrainerAsync(CreateTrainerViewModel model, CancellationToken ct = default)
         {
-            var isEmailExist = await _trainerRepository.AnyAsync(T => T.Email == model.Email, ct);
-            var isPhoneExist = await _trainerRepository.AnyAsync(T => T.Phone == model.Phone, ct);
+            var isEmailExist = await _unitOfWork.GetRepository<Trainer>().AnyAsync(T => T.Email == model.Email, ct);
+            var isPhoneExist = await _unitOfWork.GetRepository<Trainer>().AnyAsync(T => T.Phone == model.Phone, ct);
             if (isEmailExist || isPhoneExist) return false;
             var trainer = new Trainer()
             {
@@ -54,12 +51,13 @@ namespace GymManagment.BLL.Services.Classes
                 }
                 
             };
-            var result = await _trainerRepository.CreateAsync(trainer, ct);
+            _unitOfWork.GetRepository<Trainer>().Create(trainer);
+            var result = await _unitOfWork.SaveChangesAsync(ct);
             return result > 0;
         }
         public async Task<TrainerDetailsViewModel?> GetTrainerDetailsByIdAsync(int id, CancellationToken ct = default)
         {
-            var trainer = await _trainerRepository.GetByIdAsync(id, ct);
+            var trainer = await _unitOfWork.GetRepository<Trainer>().GetByIdAsync(id, ct);
             if (trainer is null) return null;
             return new TrainerDetailsViewModel
             {
@@ -74,7 +72,7 @@ namespace GymManagment.BLL.Services.Classes
 
         public async Task<TrainerToUpdateViewModel?> GetTrainerToUpdateAsync(int trainerId, CancellationToken ct = default)
         {
-            var trainer = await _trainerRepository.GetByIdAsync(trainerId, ct);
+            var trainer = await _unitOfWork.GetRepository<Trainer>().GetByIdAsync(trainerId, ct);
             if (trainer is null) return null;
             return new TrainerToUpdateViewModel
             {
@@ -90,10 +88,10 @@ namespace GymManagment.BLL.Services.Classes
 
         public async Task<bool> UpdateTrainerDetailsAsync(int trainerId, TrainerToUpdateViewModel model, CancellationToken ct = default)
         {
-            var trainer = await _trainerRepository.GetByIdAsync(trainerId, ct);
+            var trainer = await _unitOfWork.GetRepository<Trainer>().GetByIdAsync(trainerId, ct);
             if (trainer is null) return false;
-            if (await _trainerRepository.AnyAsync(T => T.Email == model.Email && T.Id != trainerId)) return false;
-            if (await _trainerRepository.AnyAsync(T => T.Phone == model.Phone && T.Id != trainerId)) return false;
+            if (await _unitOfWork.GetRepository<Trainer>().AnyAsync(T => T.Email == model.Email && T.Id != trainerId)) return false;
+            if (await _unitOfWork.GetRepository<Trainer>().AnyAsync(T => T.Phone == model.Phone && T.Id != trainerId)) return false;
             trainer.Email = model.Email;
             trainer.Phone = model.Phone;
             trainer.Speciality = model.Specialties;
@@ -102,18 +100,20 @@ namespace GymManagment.BLL.Services.Classes
             trainer.Address.City = model.City;
             trainer.UpdatedAt = DateTime.Now;
 
-            var result = await _trainerRepository.UpdateAsync(trainer, ct);
+            _unitOfWork.GetRepository<Trainer>().Update(trainer);
+            var result = await _unitOfWork.SaveChangesAsync( ct);
             return result > 0;
         }
 
         public async Task<bool> RemoveTrainerAsync(int trainerId, CancellationToken ct = default)
         {
-            var trainer = await _trainerRepository.GetByIdAsync(trainerId, ct);
+            var trainer = await _unitOfWork.GetRepository<Trainer>().GetByIdAsync(trainerId, ct);
             if (trainer is null) return false;
-            bool hasFutureSessions = await _sessionRepository.AnyAsync(s => s.TrainerId == trainerId && s.StartDate > DateTime.Now);
+            bool hasFutureSessions = await _unitOfWork.GetRepository<Session>().AnyAsync(s => s.TrainerId == trainerId && s.StartDate > DateTime.Now);
             if (hasFutureSessions) return false;
 
-            var result = await _trainerRepository.DeleteAsync(trainer, ct);
+            _unitOfWork.GetRepository<Trainer>().Delete(trainer);
+            var result = await _unitOfWork.SaveChangesAsync(ct);
             return result > 0;
         }
     }
