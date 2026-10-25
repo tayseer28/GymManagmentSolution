@@ -9,11 +9,7 @@ namespace GymManagment.Controllers
 {
     public class PlanController : Controller
     {
-        //private readonly IGenericRepository<Plan> _planRepository;
-        //public PlanController(IGenericRepository<Plan> planRepository)
-        //{
-        //    this._planRepository = planRepository;
-        //}
+
         private readonly IPlanService _planService;
         public PlanController(IPlanService planService)
         {
@@ -22,11 +18,6 @@ namespace GymManagment.Controllers
 
         // Index Action
         // baseUrl/Plan/Index
-        //public async Task<IActionResult> Index(CancellationToken ct = default)
-        //{
-        //    var plans = await _planRepository.GetAllAsync(ct: ct);
-        //    return View(plans);
-        //}
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken ct)
             => View(await _planService.GetAllPlansAsync(ct));
