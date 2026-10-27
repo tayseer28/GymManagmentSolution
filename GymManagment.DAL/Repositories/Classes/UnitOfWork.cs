@@ -11,10 +11,15 @@ namespace GymManagment.DAL.Repositories.Classes
     {
         private readonly GymManagmentDbContext _dbContext;
         private readonly Dictionary<string, object> _repositories = [];
-        public UnitOfWork(GymManagmentDbContext dbContext)
+        public UnitOfWork(GymManagmentDbContext dbContext,
+            ISessionRepository sessionRepository)
         {
             _dbContext = dbContext;
+            SessionRepository = sessionRepository;
         }
+
+        public ISessionRepository SessionRepository { get; }
+
         public IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity, new()
         {
             //check TEntity == ?? (plan, trainer, etc..)
