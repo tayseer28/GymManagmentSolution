@@ -36,15 +36,15 @@ namespace GymManagment.BLL.Services.Classes
             //    IsActive = p.IsActive 
 
             //});
-            var planViewModels = _mapper.Map < IEnumerable<Plan, IEnumerable<PlanViewModel>>(plans);
+            var planViewModels = _mapper.Map <IEnumerable<Plan>, IEnumerable<PlanViewModel>>(plans);
             return planViewModels;
         }
 
 
-        public async Task<PlanViewModel?> GetPlanDetailsByIdAsync(int planId, CancellationToken ct = default)
+        public async Task<Result<PlanViewModel>> GetPlanDetailsByIdAsync(int planId, CancellationToken ct = default)
         {
             var plan = await _unitOfWork.GetRepository<Plan>().GetByIdAsync(planId, ct);
-            if (plan is null ) return null;
+            if (plan is null ) return Result<PlanViewModel>.NotFound("Plan Not Found");
             //return new PlanViewModel
             //{
             //    Name = plan.Name,
@@ -53,7 +53,7 @@ namespace GymManagment.BLL.Services.Classes
             //    Description = plan.Description,
             //    IsActive = plan.IsActive
             //};
-            return _mapper.Map<Plan, PlanViewModel>(plan);
+            return Result<PlanViewModel>.Ok(_mapper.Map<Plan, PlanViewModel>(plan));
 
         }
 
@@ -62,11 +62,11 @@ namespace GymManagment.BLL.Services.Classes
              return await _unitOfWork.GetRepository<Membership>().AnyAsync(M => M.PlanId == planId && M.EndDate > DateTime.Now, ct);
         }
 
-        public async Task<UpdatePlanViewModel?> GetPlanToUpdateAsync(int Planid, CancellationToken ct = default)
+        public async Task<Result<UpdatePlanViewModel>> GetPlanToUpdateAsync(int Planid, CancellationToken ct = default)
         {
             var plan = await _unitOfWork.GetRepository<Plan>().GetByIdAsync(Planid, ct);
             if (plan is null || !plan.IsActive) return null;
-            if (await HasActiveMembershipsAsync(Planid, ct)) return null; //cannot edit or change in plans with active memberships 
+            if (await HasActiveMembershipsAsync(Planid, ct)) return Result<UpdatePlanViewModel>.Fail("Cannot Edit Or Change in Plans With Active Membership"); //cannot edit or change in plans with active memberships 
             //return new UpdatePlanViewModel
             //{
             //    PlanName = plan.Name,
@@ -74,14 +74,14 @@ namespace GymManagment.BLL.Services.Classes
             //    DurationDays = plan.DurationDays,
             //    Price = plan.Price
             //};
-            return _mapper.Map<Plan, UpdatePlanViewModel>(plan);
+            return Result<UpdatePlanViewModel>.Ok( _mapper.Map<Plan, UpdatePlanViewModel>(plan));
         }
 
-        public async Task<bool> UpdatePlanDetailsAsync(int planId, UpdatePlanViewModel plan, CancellationToken ct = default)
+        public async Task<Result> UpdatePlanDetailsAsync(int planId, UpdatePlanViewModel plan, CancellationToken ct = default)
         {
             var model = await _unitOfWork.GetRepository<Plan>().GetByIdAsync(planId, ct);
-            if (model is null) return false;
-            if (await HasActiveMembershipsAsync(planId, ct)) return false;
+            if (model is null) return Result.NotFound("Plan Not Found");
+            if (await HasActiveMembershipsAsync(planId, ct)) return Result.Fail("Cannot Update Plan With Active Membership");
             //model.DurationDays = plan.DurationDays;
             //model.Price = plan.Price;
             //model.Description = plan.Description;
@@ -90,19 +90,19 @@ namespace GymManagment.BLL.Services.Classes
             _unitOfWork.GetRepository<Plan>().Update(model);
             var result = await _unitOfWork.SaveChangesAsync(ct);
 
-            return result > 0;
+            return result > 0 ? Result.Ok() : Result.Fail("Update Plan Failed");
         }
 
-        public async Task<bool> ToggleActivationAsync(int planId, CancellationToken ct = default)
+        public async Task<Result> ToggleActivationAsync(int planId, CancellationToken ct = default)
         {
             var plan = await _unitOfWork.GetRepository<Plan>().GetByIdAsync(planId, ct);
-            if (plan is null) return false;
-            if (plan.IsActive && await HasActiveMembershipsAsync(planId, ct)) return false;
+            if (plan is null) return Result.NotFound("Plan Not Found");
+            if (plan.IsActive && await HasActiveMembershipsAsync(planId, ct)) return Result.Fail("Cannot Remove Active or Has Active Memberships Plan");
             plan.IsActive = !plan.IsActive;
             plan.UpdatedAt = DateTime.Now;
             _unitOfWork.GetRepository<Plan>().Update(plan);
             var result = await _unitOfWork.SaveChangesAsync(ct);
-            return result > 0;
+            return result > 0 ? Result.Ok() : Result.Fail("Remove Plan Failed");
         }
     }
 }

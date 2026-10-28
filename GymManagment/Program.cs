@@ -26,9 +26,9 @@ namespace GymManagment
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfile ()));
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             builder.Services.AddDbContext<GymManagmentDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
             
 
             var app = builder.Build();

@@ -27,12 +27,13 @@ namespace GymManagment.Controllers
         public async Task<IActionResult> Details(int id, CancellationToken ct = default)
         {
             var plan = await _planService.GetPlanDetailsByIdAsync(id, ct);
-            if (plan == null) // we check on null in case the user enter id thorugh the url not through the button
+            if (plan.Success) // we check on null in case the user enter id thorugh the url not through the button
+                return View(plan.Value);
+            else
             {
-                TempData["ErrorMessage"] = "Plan Details Fetch Failed";
+                TempData["ErrorMessage"] = plan.Error;
                 return RedirectToAction(nameof(Index));
             }
-            return View(plan);
         }
 
         #region Edit
@@ -42,12 +43,13 @@ namespace GymManagment.Controllers
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
             var result = await _planService.GetPlanToUpdateAsync(id, ct);
-            if(result is null)
+            if(result.Success)
+                return View(result.Value);
+            else
             {
-                TempData["ErrorMessage"] = "Plan Not Fount";
+                TempData["ErrorMessage"] = result.Error;
                 return RedirectToAction(nameof(Index));
             }
-            return View(result);
 
         }
 
@@ -57,10 +59,7 @@ namespace GymManagment.Controllers
         public async Task<IActionResult> Edit(int id, UpdatePlanViewModel model, CancellationToken ct)
         {
             var result = await _planService.UpdatePlanDetailsAsync(id, model, ct);
-            if (result)
-                TempData["SuccessMessage"] = "Plan Updated Seccessfully!";
-            else
-                TempData["ErrorMessage"] = "Failed To Update Plan";
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success ? "Plan Updated Seccessfully!" : result.Error;
             return RedirectToAction(nameof(Index));
         }
         #endregion
@@ -69,6 +68,8 @@ namespace GymManagment.Controllers
         public async Task<IActionResult> Activate(int id , CancellationToken ct)
         {
             var result = await _planService.ToggleActivationAsync(id, ct);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success ? "Plan status changed!" : result.Error;
+
             if (result)
                 TempData["SuccessMessage"] = "Plan status changed";
             else
