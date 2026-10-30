@@ -70,10 +70,10 @@ namespace GymManagment.Controllers
             var result = await _planService.ToggleActivationAsync(id, ct);
             TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success ? "Plan status changed!" : result.Error;
 
-            if (result)
-                TempData["SuccessMessage"] = "Plan status changed";
-            else
-                TempData["ErrorMessage"] = "Failed to activate";
+            //if (result.)
+            //    TempData["SuccessMessage"] = "Plan status changed";
+            //else
+            //    TempData["ErrorMessage"] = "Failed to activate";
             return RedirectToAction(nameof(Index));
         }
     }

@@ -6,7 +6,7 @@ namespace GymManagment.DAL.Data.Models
 {
     public class Member : GymUser
     {
-        public string? Photo { get; set; }
+        public string Photo { get; set; } = default!;
         // JoinDate is the CreatedAt of the BaseEntity so we will handle this in the configuration class
 
         #region Relationships

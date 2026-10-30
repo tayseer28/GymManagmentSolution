@@ -1,4 +1,5 @@
 ﻿using GymManagementBLL.Common;
+using GymManagment.BLL.Attachment;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.MemberViewModels;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,9 +10,13 @@ namespace GymManagment.PL.Controllers
     public class MemberController : Controller
     {
         private readonly IMemberService _memberService;
-        public MemberController(IMemberService memberService)
+        private readonly IAttachmentService _attachmentService;
+
+        public MemberController(IMemberService memberService,
+            IAttachmentService attachmentService)
         {
             _memberService = memberService;
+            _attachmentService = attachmentService;
         }
         // GET BaseUrl/Member/Index
         //Index - List All members
@@ -22,6 +27,22 @@ namespace GymManagment.PL.Controllers
             return View(members);
         }
 
+        #region Get Member Photo
+        [HttpGet]
+        public async Task<IActionResult> Picture(int id)
+        {
+            var member = await _memberService.GetMemberDetailsByIdAsync(id);
+            if (member.Value is null || string.IsNullOrEmpty(member.Value.Photo))
+                return NotFound();
+
+            var result = _attachmentService.GetFile(member.Value.Photo, "MembersPictures");
+            if (result is null) return NotFound();
+
+            return File(result.Value.Stream, result.Value.ContentType);
+        }
+        #endregion
+
+        #region Member Details
 
         // GET BaseUrl/Member/MemberDetails/{id}
         // MemberDetails - Show details of a specific member by ID
@@ -55,6 +76,7 @@ namespace GymManagment.PL.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+        #endregion
 
         #region Create Member
 

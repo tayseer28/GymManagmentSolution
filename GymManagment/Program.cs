@@ -1,11 +1,14 @@
 using GymManagment.BLL;
+using GymManagment.BLL.Attachment;
 using GymManagment.BLL.Services.Classes;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.DAL.Data.DataSeeding;
 using GymManagment.DAL.Data.DbContexts;
+using GymManagment.DAL.Data.Models;
 using GymManagment.DAL.Repositories.Classes;
 using GymManagment.DAL.Repositories.Interfaces;
 using GymManagment.PL;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymManagment
@@ -27,9 +30,22 @@ namespace GymManagment
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfile ()));
             builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+            builder.Services.AddScoped<IAttachmentService, AttachmentService>();
             builder.Services.AddDbContext<GymManagmentDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(Config =>
+            {
+                //Config.Password.RequiredLength = 6;               // default
+                //Config.Password.RequireLowercase = true;          // default
+                //Config.Password.RequireUppercase = true;          // default
+                Config.User.RequireUniqueEmail = true;
+                Config.Lockout.MaxFailedAccessAttempts = 5;
+                Config.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+
+            }).AddEntityFrameworkStores<GymManagmentDbContext>();
+
+
 
             var app = builder.Build();
 
