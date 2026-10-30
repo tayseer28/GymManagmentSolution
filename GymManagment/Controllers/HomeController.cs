@@ -1,14 +1,27 @@
+using GymManagment.BLL.Services.Interfaces;
 using GymManagment.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace GymManagment.Controllers
+namespace GymManagment.PL.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ILogger<HomeController> _logger;
+        private readonly IAnalyticsService _analyticsService;
+
+        public HomeController(ILogger<HomeController> logger,
+            IAnalyticsService analyticsService)
         {
-            return View();
+            _logger = logger;
+            _analyticsService = analyticsService;
+        }
+        public async Task<IActionResult> Index(CancellationToken ct)
+        {
+            var data = await _analyticsService.GetDataAsync(ct);
+            return View(data);
         }
 
         public IActionResult Privacy()
