@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Execution;
-using GymManagementBLL.Common;
+using GymManagment.BLL.Common;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.TrainerViewModels;
 using GymManagment.DAL.Data.Models;
@@ -122,7 +122,7 @@ namespace GymManagment.BLL.Services.Classes
             //trainer.Address.Street = model.Street;
             //trainer.Address.BuildingNo = model.BuildingNumber;
             //trainer.Address.City = model.City;
-            _mapper.Map(model, trainer);
+             _mapper.Map(model, trainer);
             trainer.UpdatedAt = DateTime.Now;
 
             _unitOfWork.GetRepository<Trainer>().Update(trainer);

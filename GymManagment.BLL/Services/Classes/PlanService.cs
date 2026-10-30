@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GymManagementBLL.Common;
+using GymManagment.BLL.Common;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.PlanViewModels;
 using GymManagment.DAL.Data.Models;
@@ -65,7 +65,7 @@ namespace GymManagment.BLL.Services.Classes
         public async Task<Result<UpdatePlanViewModel>> GetPlanToUpdateAsync(int Planid, CancellationToken ct = default)
         {
             var plan = await _unitOfWork.GetRepository<Plan>().GetByIdAsync(Planid, ct);
-            if (plan is null || !plan.IsActive) return null;
+            if (plan is null || !plan.IsActive) return Result<UpdatePlanViewModel>.Fail("Plan Not Found Or Active");
             if (await HasActiveMembershipsAsync(Planid, ct)) return Result<UpdatePlanViewModel>.Fail("Cannot Edit Or Change in Plans With Active Membership"); //cannot edit or change in plans with active memberships 
             //return new UpdatePlanViewModel
             //{

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GymManagementBLL.Common;
+using GymManagment.BLL.Common;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.SessionViewModel;
 using GymManagment.DAL.Data.Models;
@@ -61,7 +61,7 @@ namespace GymManagment.BLL.Services.Classes
             var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(model.CategoryId);
             if (category is null) return Result.NotFound("Category Not Fount");
             var isValidSpeciality = Enum.TryParse<Speciality>(category.CategoryName, true, out var CategorySpeciality);
-            if (!isValidSpeciality || trainer.Speciality != CategorySpeciality) return Result.Validation("Cannot Session To This Trainer");
+            if (!isValidSpeciality || trainer.Speciality != CategorySpeciality) return Result.Validation("Cannot Assign Session Category To This Trainer");
 
             var session = _mapper.Map<CreateSessionViewModel, Session>(model);
             _unitOfWork.GetRepository<Session>().Create(session);
@@ -132,7 +132,7 @@ namespace GymManagment.BLL.Services.Classes
         {
             var session = await _unitOfWork.SessionRepository.GetByIdAsync(sessionId);
             if (session is null) return Result.NotFound("Sesison Not Found");
-            if (session.EndDate >= DateTime.Now) return Result.Fail("Cannot Delete Ongoing Session");
+            if (session.EndDate >= DateTime.Now) return Result.Fail("Cannot delete a session that has not yet ended.");
             var bookingCount = await _unitOfWork.SessionRepository.GetCountOfBookedSlotsAsync(sessionId, ct);
             if (bookingCount > 0) return Result.Fail("Cannot Delete Sessions That Has Bookings");
 

@@ -15,7 +15,7 @@
   </ItemGroup>
 	
 	<ItemGroup>
-		<FrameworkReference include =" Microsoft.AspNetCore"/>
-	</ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+</ItemGroup>
 
 </Project>

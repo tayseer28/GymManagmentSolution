@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GymManagementBLL.Common;
+using GymManagment.BLL.Common;
 using GymManagment.BLL.Attachment;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.MemberViewModels;

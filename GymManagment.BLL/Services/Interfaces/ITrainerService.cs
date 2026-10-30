@@ -1,4 +1,4 @@
-﻿using GymManagementBLL.Common;
+﻿using GymManagment.BLL.Common;
 using GymManagment.BLL.ViewModel.MemberViewModels;
 using GymManagment.BLL.ViewModel.TrainerViewModels;
 using System;

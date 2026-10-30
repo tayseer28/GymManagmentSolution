@@ -1,4 +1,4 @@
-﻿using GymManagementBLL.Common;
+﻿using GymManagment.BLL.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
