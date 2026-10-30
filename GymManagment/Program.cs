@@ -20,17 +20,27 @@ namespace GymManagment
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            #region Services
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IPlanService, PlanService>();
-            builder.Services.AddScoped<IPlanService, PlanService>();
             builder.Services.AddScoped<ITrainerService, TrainerService>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-            builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfile ()));
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IMembershipService, MembershipService>();
+            builder.Services.AddScoped<ISessionService, SessionService>(); 
             builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+            #endregion
+
+            #region Repositories _ UOW
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            #endregion;
+
+            builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfile()));
             builder.Services.AddDbContext<GymManagmentDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -62,12 +72,13 @@ namespace GymManagment
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Account}/{action=Login}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

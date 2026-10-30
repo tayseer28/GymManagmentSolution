@@ -8,7 +8,7 @@ namespace GymManagment.DAL.Repositories.Interfaces
 {
     public interface IGenericRepository<TEntity>  where TEntity : BaseEntity , new()
     {
-        Task<IEnumerable<TEntity>> GetAllAsync(bool track = false, CancellationToken ct = default);
+        Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null, bool track = false, CancellationToken ct = default);
         Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool track = false, CancellationToken ct = default);
