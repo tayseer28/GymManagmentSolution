@@ -9,8 +9,8 @@ namespace GymManagment.DAL.Repositories.Interfaces
     {
         IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity, new();
         Task<int> SaveChangesAsync(CancellationToken ct);
-        //public IMembershipRepository MembershipRepository { get; }
+        public IMembershipRepository MembershipRepository { get; }
         public ISessionRepository SessionRepository { get; }
-        //public IBookingRepository BookingRepository { get; }
+        public IBookingRepository BookingRepository { get; }
     }
 }
