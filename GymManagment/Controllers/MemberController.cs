@@ -1,12 +1,14 @@
-﻿using GymManagementBLL.Common;
+﻿using GymManagment.BLL.Common;
 using GymManagment.BLL.Attachment;
 using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.MemberViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagment.PL.Controllers
 {
+    [Authorize(Roles ="SuperAdmin")]
     public class MemberController : Controller
     {
         private readonly IMemberService _memberService;
@@ -35,7 +37,7 @@ namespace GymManagment.PL.Controllers
             if (member.Value is null || string.IsNullOrEmpty(member.Value.Photo))
                 return NotFound();
 
-            var result = _attachmentService.GetFile(member.Value.Photo, "MembersPictures");
+            var result = _attachmentService.GetFile(member.Value.Photo, "MembersPhoto");
             if (result is null) return NotFound();
 
             return File(result.Value.Stream, result.Value.ContentType);
@@ -68,7 +70,7 @@ namespace GymManagment.PL.Controllers
         {
             var result = await _memberService.GetMemberHealthRecordDetailsAsync(id, ct);
             if (result.Success)
-                return View(result);
+                return View(result.Value);
 
             else
             {

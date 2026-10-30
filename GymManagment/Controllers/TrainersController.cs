@@ -1,35 +1,34 @@
-﻿using GymManagment.BLL.Services.Classes;
-using GymManagment.BLL.Services.Interfaces;
-using GymManagment.BLL.ViewModel;
+﻿using GymManagment.BLL.Services.Interfaces;
 using GymManagment.BLL.ViewModel.TrainerViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagment.PL.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class TrainersController : Controller
     {
-
         private readonly ITrainerService _trainerService;
         public TrainersController(ITrainerService trainerService)
         {
             _trainerService = trainerService;
         }
 
-        public async Task<IActionResult> Index() 
+        public async Task<IActionResult> Index()
             => View(await _trainerService.GetAllTrainersAsync());
 
         [HttpGet]
         public async Task<IActionResult> Details(int id, CancellationToken ct)
         {
             var trainer = await _trainerService.GetTrainerDetailsByIdAsync(id, ct);
-            if(trainer.Success)
-                return View(trainer);
+            if (trainer.Success)
+                return View(trainer.Value);
             else
             {
                 TempData["ErrorMessage"] = trainer.Error;
                 return RedirectToAction(nameof(Index));
             }
-                
+
         }
 
 
@@ -39,11 +38,11 @@ namespace GymManagment.PL.Controllers
             => View();
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTrainerViewModel model , CancellationToken ct)
+        public async Task<IActionResult> Create(CreateTrainerViewModel model, CancellationToken ct)
         {
             if (!ModelState.IsValid) return View(model); //return user to the form again
             var result = await _trainerService.CreateTrainerAsync(model, ct);
-            if(result.Success)
+            if (result.Success)
             {
                 TempData["SuccessMessage"] = "Trainer created successfully.";
                 return RedirectToAction(nameof(Index));
@@ -60,10 +59,10 @@ namespace GymManagment.PL.Controllers
 
         #region Edit Trainer
         [HttpGet]
-        public async Task<IActionResult> Edit(int id , CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
             var trainer = await _trainerService.GetTrainerToUpdateAsync(id, ct);
-            if(trainer.Success)
+            if (trainer.Success)
                 return View(trainer.Value);
             else
             {
@@ -72,7 +71,7 @@ namespace GymManagment.PL.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(int id , TrainerToUpdateViewModel model, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, TrainerToUpdateViewModel model, CancellationToken ct)
         {
             if (!ModelState.IsValid) return View(model);
             var result = await _trainerService.UpdateTrainerDetailsAsync(id, model, ct);
